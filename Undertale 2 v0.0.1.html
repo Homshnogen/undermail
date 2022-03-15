@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>It's Undermail</title>
+</head>
+<body>
+<h1>Welcome to Undermail</h1>
+<h3 id = "dispUI" style = "position:absolute;top:50px;height:200px;">
+</h3>
+<div id = "houseDiv" style = "position:absolute;top:250px;">
+</div>
+
+<script>
+
+var roof = ["images/r0.png", "images/r1.png", "images/r2.png", "images/r3.png", "images/r4.png", "images/r5.png"];
+var building = ["images/b0.png", "images/b1.png", "images/b2.png", "images/b3.png", "images/b4.png", "images/b5.png"];
+
+
+var dispUI = document.getElementById("dispUI");
+var houseDiv = document.getElementById("houseDiv");
+
+
+var warning = document.createElement("p");
+dispUI.appendChild(warning);
+var info = document.createElement("p");
+dispUI.appendChild(info);
+var mailbox = document.createElement("p");
+dispUI.appendChild(mailbox);
+warning.style.height = "30px";
+info.style.height = "30px";
+mailbox.style.height = "30px";
+var MAIL = null;
+
+var Mail = function(a,b,c)
+{
+	this.from = a;
+	this.to = b;
+	this.message = c;
+};
+
+var House = function()
+{
+  this.object = document.createElement("div");
+  this.object.setAttribute("style", "position:relative;height:300px;width:300px;float:left;");
+  this.name = "house" + (10 * Math.random());
+	
+	this.roof = document.createElement("img");
+	this.roof.setAttribute("style", "position:absolute;top:0px;left:0px;");
+	this.roof.setAttribute("src", roof[Math.floor(Math.random()*roof.length)]);
+	this.building = document.createElement("img");
+	this.building.setAttribute("style", "position:absolute;top:100px;left:0px;");
+	this.building.setAttribute("src", building[Math.floor(Math.random()*building.length)]);
+	this.mailbox = document.createElement("img");
+	this.mailbox.setAttribute("style", "position:absolute;top:100px;left:200px;");
+	this.mailbox.setAttribute("src", "images/mailempty.png");
+	this.object.appendChild(this.building);
+	this.object.appendChild(this.roof);
+	this.object.appendChild(this.mailbox);
+	
+  this.mail = [];
+  
+  this.genMail = function()
+  {
+	var to;
+	var count = 0;
+	for (var house in houses)
+	{
+		if (house == this.name) continue;
+		to = (Math.random() < 1/++count) ? house : to;
+	}
+	this.addMail(new Mail(this.name, to, "Helo hi i am hello " + (110000 * Math.random())));
+  };
+  
+  this.addMail = function(mail)
+  {
+	if (mail != null)
+	{
+		this.mail.push(mail);
+		this.object.setAttribute("hasMail", "true");
+		this.mailbox.setAttribute("src", "images/mailfull.png");
+	}
+  };
+  this.getMail = function()
+  {
+	if (this.mail.length == 0) return null;
+    var ret = this.mail.pop();
+	if (this.mail.length == 0)
+	{
+		this.object.setAttribute("hasMail", "false");
+		this.mailbox.setAttribute("src", "images/mailempty.png");
+	}
+	return ret;
+  };
+  
+  this.object.setAttribute("id", this.name);
+  this.object.setAttribute("onmouseover", "houseover(this)");
+  this.object.setAttribute("onclick", "houseclick(this)");
+  this.object.setAttribute("hasMail", "false");
+  
+};
+
+
+var houses = {};
+
+for (var i = 0; i < 10; i++)
+{
+	var temp = new House();
+	houses[temp.name] = temp;
+	houseDiv.appendChild(temp.object);
+}
+for (var i = 0; i < 5; i++)
+{
+	var from;
+	var count = 0;
+	for (var house in houses)
+	{
+		if (Math.random() < 1/++count)
+		{
+			from = houses[house];
+		}
+	}
+	from.genMail();
+}
+
+
+  
+  var houseover = function(obj)
+  {
+    info.innerHTML = obj.getAttribute("id");
+  };
+  
+  var houseclick = function(obj)
+  {
+	if (MAIL == null)
+	{
+		MAIL = houses[obj.getAttribute("id")].getMail();
+	}
+	else
+	{
+		if (obj.getAttribute("id") == MAIL.to)
+		{
+			warning.innerHTML = "Message Delivered to " + MAIL.to;
+			MAIL = null;
+		}
+	}
+	
+	if(MAIL == null)
+	{
+		mailbox.innerHTML = "";
+	}
+	else
+	{
+		mailbox.innerHTML = 'From: ' + MAIL.from + '\nTo: ' + MAIL.to + '\n\n' + MAIL.message;
+	}
+  };
+</script>
+</body>
+</html>
+  
+  
